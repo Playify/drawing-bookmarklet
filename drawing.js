@@ -38,6 +38,7 @@
 
         canvas.width = window.innerWidth * dpr;
         canvas.height = window.innerHeight * dpr;
+        canvas.style.transform = "scale("+(1/dpr)+")";
 
         document.body.appendChild(canvas);
 
@@ -55,6 +56,8 @@
         document.sdmcdKeyAborter = new AbortController();
         window.addEventListener("keydown", keyDown, { capture: true, signal: document.sdmcdKeyAborter.signal });
         window.addEventListener("keyup", keyUp, { capture: true, signal: document.sdmcdKeyAborter.signal });
+        document.sdmcdResizeAborter = new AbortController();
+        window.addEventListener("resize", onResize, { signal: document.sdmcdResizeAborter.signal });
     } else {
         document.body.classList.remove("sdmcd-unfocused");
         document.body.classList.remove("sdmcd-hidden");
@@ -64,6 +67,7 @@
     function removeDrawing() {
         removeMouseListeners();
         document.sdmcdKeyAborter.abort();
+        document.sdmcdResizeAborter.abort();
         document.getElementById("sdmcd-canvas")?.remove();
         document.getElementById("sdmcd-popup-bg")?.remove();
         document.getElementById("sdmcd-brush-outline")?.remove();
@@ -71,6 +75,28 @@
         for (const input of document.getElementsByClassName("sdmcd-text-input")) {
             input.remove();
         }
+    }
+    
+    function onResize(){
+        const dpr = window.devicePixelRatio;
+
+        if(canvas.width > window.innerWidth * dpr && canvas.height > window.innerHeight * dpr)
+            return;
+
+        // Create a temporary canvas to store the current content
+        const tempCanvas = document.createElement("canvas");
+        tempCanvas.width = canvas.width;
+        tempCanvas.height = canvas.height;
+        const tempCtx = tempCanvas.getContext("2d");
+        tempCtx.drawImage(canvas, 0, 0);
+        
+        // Update canvas size to be the maximum it ever was, so old data doesn't get deleted while resizing.
+        canvas.width = Math.max(canvas.width,window.innerWidth * dpr);
+        canvas.height = Math.max(canvas.height,window.innerHeight * dpr);
+        canvas.style.transform = "scale("+(1/dpr)+")";
+        ctx.resetTransform();
+        ctx.drawImage(tempCanvas, 0, 0);
+        ctx.scale(dpr, dpr);
     }
 
     function contextMenu(e) {
@@ -976,7 +1002,7 @@
         } catch (_) {}
 
         style.innerHTML =
-            "#sdmcd-canvas,#sdmcd-popup-bg{top:0;left:0;width:100vw;height:100vh;position:fixed}#sdmcd-canvas{z-index:9999997;cursor:crosshair}.sdmcd-hidden #sdmcd-canvas,.sdmcd-hidden .sdmcd-text-input,.sdmcd-text-input.removed{display:none}.sdmcd-unfocused #sdmcd-canvas,.sdmcd-unfocused .sdmcd-text-input{pointer-events:none}#sdmcd-popup-bg{z-index:9999999;background-color:rgba(0,0,0,.8);display:flex;justify-content:center;align-items:center;font-size:1vw;color:#fff;font-family:Helvetica,sans-serif}#sdmcd-popup-content{display:flex;flex-direction:column;justify-content:center;align-items:center;pointer-events:none}#sdmcd-help-bg{display:flex;width:45em;background-color:#2b2b2e;color:#fff;font-family:Arial,sans-serif;font-size:min(1.25em, 2vw, 2vh);padding:1em 2.5em;gap:3em;pointer-events:all;border-radius:.5em}#sdmcd-help-left,#sdmcd-help-right{flex:1;padding:1em}#sdmcd-help-bg #sdmcd-help-left{flex:1.7}#sdmcd-help-bg h3{font-size:1.3em;margin-bottom:.8em}.sdmcd-help-line{display:flex;justify-content:space-between;height:1.5em;border-bottom:1px solid #ffffff22;margin:.2em 0}.sdmcd-help-line code{background-color:#222124;padding:.1em .3em;border-radius:.2em;text-transform:uppercase}#sdmcd-color-content{font-size:2em;display:flex;flex-direction:column;align-items:center;gap:.2em}#sdmcd-color{width:20em;height:20em;border-radius:1em;padding:0;border:none;outline:0;cursor:pointer;pointer-events:auto}#sdmcd-color::-webkit-color-swatch-wrapper{padding:0}#sdmcd-color::-webkit-color-swatch{border:none;border-radius:.5em}#sdmcd-brush-outline{position:fixed;border-radius:50%;border:1px solid #888;pointer-events:none;z-index:9999998}#sdmcd-brush-outline.sdmcd-fading{opacity:0;transition:opacity .5s}.sdmcd-text-input{position:fixed;z-index:9999998;outline:0;border-right:1px solid transparent;font-family:Arial,Helvetica,sans-serif;font-weight:400}";
+            "#sdmcd-canvas,#sdmcd-popup-bg{top:0;left:0;position:fixed}#sdmcd-canvas{transform-origin:top left;z-index:9999997;cursor:crosshair}.sdmcd-hidden #sdmcd-canvas,.sdmcd-hidden .sdmcd-text-input,.sdmcd-text-input.removed{display:none}.sdmcd-unfocused #sdmcd-canvas,.sdmcd-unfocused .sdmcd-text-input{pointer-events:none}#sdmcd-popup-bg{width:100vw;height:100vh;z-index:9999999;background-color:rgba(0,0,0,.8);display:flex;justify-content:center;align-items:center;font-size:1vw;color:#fff;font-family:Helvetica,sans-serif}#sdmcd-popup-content{display:flex;flex-direction:column;justify-content:center;align-items:center;pointer-events:none}#sdmcd-help-bg{display:flex;width:45em;background-color:#2b2b2e;color:#fff;font-family:Arial,sans-serif;font-size:min(1.25em, 2vw, 2vh);padding:1em 2.5em;gap:3em;pointer-events:all;border-radius:.5em}#sdmcd-help-left,#sdmcd-help-right{flex:1;padding:1em}#sdmcd-help-bg #sdmcd-help-left{flex:1.7}#sdmcd-help-bg h3{font-size:1.3em;margin-bottom:.8em}.sdmcd-help-line{display:flex;justify-content:space-between;height:1.5em;border-bottom:1px solid #ffffff22;margin:.2em 0}.sdmcd-help-line code{background-color:#222124;padding:.1em .3em;border-radius:.2em;text-transform:uppercase}#sdmcd-color-content{font-size:2em;display:flex;flex-direction:column;align-items:center;gap:.2em}#sdmcd-color{width:20em;height:20em;border-radius:1em;padding:0;border:none;outline:0;cursor:pointer;pointer-events:auto}#sdmcd-color::-webkit-color-swatch-wrapper{padding:0}#sdmcd-color::-webkit-color-swatch{border:none;border-radius:.5em}#sdmcd-brush-outline{position:fixed;border-radius:50%;border:1px solid #888;pointer-events:none;z-index:9999998}#sdmcd-brush-outline.sdmcd-fading{opacity:0;transition:opacity .5s}.sdmcd-text-input{position:fixed;z-index:9999998;outline:0;border-right:1px solid transparent;font-family:Arial,Helvetica,sans-serif;font-weight:400}";
         document.head.appendChild(style);
     }
 })();
