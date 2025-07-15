@@ -38,7 +38,7 @@
 
         canvas.width = window.innerWidth * dpr;
         canvas.height = window.innerHeight * dpr;
-        canvas.style.transform = "scale("+(1/dpr)+")";
+        canvas.style.transform = "scale(" + 1 / dpr + ")";
 
         document.body.appendChild(canvas);
 
@@ -76,24 +76,23 @@
             input.remove();
         }
     }
-    
-    function onResize(){
+
+    function onResize() {
         const dpr = window.devicePixelRatio;
 
-        if(canvas.width > window.innerWidth * dpr && canvas.height > window.innerHeight * dpr)
-            return;
+        if (canvas.width > window.innerWidth * dpr && canvas.height > window.innerHeight * dpr) return;
 
-        // Create a temporary canvas to store the current content
+        // create a temporary canvas to store the current content
         const tempCanvas = document.createElement("canvas");
         tempCanvas.width = canvas.width;
         tempCanvas.height = canvas.height;
         const tempCtx = tempCanvas.getContext("2d");
         tempCtx.drawImage(canvas, 0, 0);
-        
-        // Update canvas size to be the maximum it ever was, so old data doesn't get deleted while resizing.
-        canvas.width = Math.max(canvas.width,window.innerWidth * dpr);
-        canvas.height = Math.max(canvas.height,window.innerHeight * dpr);
-        canvas.style.transform = "scale("+(1/dpr)+")";
+
+        // update canvas size to be the maximum it ever was, so old data doesn't get deleted while resizing
+        canvas.width = Math.max(canvas.width, window.innerWidth * dpr);
+        canvas.height = Math.max(canvas.height, window.innerHeight * dpr);
+        canvas.style.transform = "scale(" + 1 / dpr + ")";
         ctx.resetTransform();
         ctx.drawImage(tempCanvas, 0, 0);
         ctx.scale(dpr, dpr);
