@@ -72,9 +72,7 @@
         document.getElementById("sdmcd-popup-bg")?.remove();
         document.getElementById("sdmcd-brush-outline")?.remove();
         // clear text inputs
-        for (const input of document.getElementsByClassName("sdmcd-text-input")) {
-            input.remove();
-        }
+        document.querySelectorAll(".sdmcd-text-input").forEach(el => el.remove());
     }
 
     function onResize() {
