@@ -1,13 +1,13 @@
 {
     "name": "drawing-bookmarklet",
-    "version": "1.2.3",
+    "version": "1.2.4",
     "description": "An intuitive bookmarklet for drawing over web pages.",
     "main": "drawing.js",
     "scripts": {
         "minify": "terser drawing.js -o drawing.min.js -c --mangle"
     },
-    "devDependencies":{
-        "terser":"^5.44.0"
+    "devDependencies": {
+        "terser": "^5.44.0"
     },
     "repository": {
         "type": "git",
